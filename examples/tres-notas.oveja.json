@@ -1,0 +1,58 @@
+{
+  "formato": "escriba-oveja",
+  "version": 1,
+  "paquete": "campana-campanas-hundidas",
+  "titulo": "Las campanas hundidas · Tres descubrimientos",
+  "config": { "carpeta": "Las campanas hundidas" },
+  "notas": [
+    {
+      "id": "rumor-del-campanario",
+      "tipo": "lore",
+      "categoria": "Rumores",
+      "titulo": "La campana bajo el agua",
+      "texto": "Los pescadores dicen que, en las noches sin viento, una campana suena desde el fondo del lago. Nadie quiere salir a pescar después del tercer tañido.",
+      "config": { "visibilidad": "gm" },
+      "variaciones": [
+        {
+          "id": "testimonio",
+          "titulo": "El testimonio de Mara",
+          "texto": "No es una campana —susurra Mara—. Mi hermano oyó su propio nombre entre los golpes. A la mañana siguiente, su barca estaba vacía.",
+          "condicion": "Compartir cuando los personajes ganen la confianza de Mara en el embarcadero.",
+          "config": { "visibilidad": "gm" }
+        }
+      ]
+    },
+    {
+      "id": "inscripcion-del-santuario",
+      "tipo": "lore",
+      "categoria": "Lugares",
+      "titulo": "La inscripción del santuario",
+      "texto": "En el dintel cubierto de musgo se distinguen tres círculos concéntricos. Bajo ellos, una inscripción rota: Mientras la última voz recuerde…",
+      "variaciones": [
+        {
+          "id": "traduccion-completa",
+          "titulo": "Las palabras recuperadas",
+          "texto": "Mientras la última voz recuerde el nombre de los que duermen, la puerta permanecerá cerrada. No llaméis a quien no pueda responder.",
+          "condicion": "Compartir tras reconstruir los fragmentos de la inscripción.",
+          "config": { "visibilidad": "gm" }
+        }
+      ]
+    },
+    {
+      "id": "carta-del-vigilia",
+      "tipo": "lore",
+      "categoria": "Documentos",
+      "titulo": "La última carta del vigía",
+      "texto": "Si encontrás esta carta, no hagas sonar la campana. Escribí nuestros nombres en piedra. El agua borra la tinta y con ella se lleva el recuerdo.",
+      "variaciones": [
+        {
+          "id": "reverso",
+          "titulo": "El reverso de la carta",
+          "texto": "Mara, perdoname. No bajé para buscar el tesoro. Bajé porque escuché la voz de nuestra madre.",
+          "condicion": "Compartir cuando sequen cuidadosamente el papel y examinen el reverso.",
+          "config": { "visibilidad": "gm" }
+        }
+      ]
+    }
+  ]
+}

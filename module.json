@@ -1,0 +1,16 @@
+{
+  "id": "eco-mistico-escriba-oveja",
+  "title": "Eco Místico — Escriba Oveja",
+  "description": "Importa paquetes de notas del DM y lore a diarios organizados por categoría, con variaciones y visibilidad por página.",
+  "version": "0.1.0",
+  "url": "https://github.com/188233/eco-mistico-escriba-oveja",
+  "manifest": "https://github.com/188233/eco-mistico-escriba-oveja/releases/latest/download/module.json",
+  "download": "https://github.com/188233/eco-mistico-escriba-oveja/releases/download/v0.1.0/eco-mistico-escriba-oveja-0.1.0.zip",
+  "authors": [{ "name": "Fabián Benítez — Eco Místico Studios" }],
+  "compatibility": { "minimum": "14", "maximum": "14" },
+  "esmodules": ["scripts/main.js"],
+  "styles": ["styles/oveja.css"],
+  "readme": "README.md",
+  "license": "LICENSE",
+  "changelog": "CHANGELOG.md"
+}

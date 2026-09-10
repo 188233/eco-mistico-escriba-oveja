@@ -1,0 +1,51 @@
+<section class="oveja-panel">
+  <header class="oveja-heading">
+    <p class="oveja-eyebrow">ECO MÍSTICO · ESCRIBA OVEJA · 0.1</p>
+    <h2>Del relato al diario</h2>
+    <p>Importá notas del DM y lore, organizadas por categoría. Revisá el contenido y quién podrá leerlo.</p>
+  </header>
+  <div class="oveja-file">
+    <label>Paquete de notas (.oveja.json, hasta 2 MB)
+      <input type="file" accept=".json,application/json" {{#if busy}}disabled{{/if}}>
+    </label>
+    <button type="button" data-action="example"><i class="fa-solid fa-download"></i> Descargar ejemplo</button>
+  </div>
+  {{#if error}}<p class="oveja-error" role="alert">{{error}}</p>{{/if}}
+  {{#if report}}
+    <div class="oveja-report" role="status">
+      <strong>{{report.created.length}} diarios creados · {{report.skipped.length}} notas omitidas</strong>
+      {{#each report.created}}<p>Creado: {{title}}</p>{{/each}}
+      {{#each report.skipped}}<p>Ya existía: {{this}}</p>{{/each}}
+      {{#each report.errors}}<p class="oveja-error">{{this}}</p>{{/each}}
+      {{#if report.errors.length}}<p>Los diarios creados se conservan. Podés reintentar: se omitirán los que ya existen. Pueden quedar carpetas vacías si una creación falla.</p>{{/if}}
+    </div>
+  {{/if}}
+  <div class="oveja-review">
+    {{#if hasPackage}}
+      <h3>{{title}}</h3><p class="oveja-muted">{{filename}}</p>
+      {{#each notes}}
+        <article class="oveja-note">
+          <header>
+            <label class="oveja-selection"><input type="checkbox" data-note="{{id}}" {{#if selected}}checked{{/if}} {{#if duplicate}}disabled{{else}}{{#if ../busy}}disabled{{/if}}{{/if}}> <strong>{{titulo}}</strong></label>
+            <span class="oveja-badge">{{tipo}} · {{audience}}</span>
+          </header>
+          <p class="oveja-muted">{{destination}}</p>
+          {{#if duplicate}}<p class="oveja-existing">Ya importada: se omite y se conserva el diario existente.</p>{{/if}}
+          <details><summary>Texto principal</summary><div class="oveja-text">{{texto}}</div></details>
+          {{#each variations}}
+            <details><summary>{{titulo}} <span class="oveja-badge">{{audience}}</span></summary>
+              <div class="oveja-text">{{texto}}</div>
+              {{#if condicion}}<p class="oveja-condition"><strong>Guía para el DM:</strong> {{condicion}}</p>{{/if}}
+            </details>
+          {{/each}}
+        </article>
+      {{/each}}
+    {{else}}
+      <div class="oveja-empty"><i class="fa-solid fa-book-open"></i><h3>Una historia, varias notas</h3><p>Cargá un paquete para revisar sus diarios, categorías y variaciones antes de importarlos.</p></div>
+    {{/if}}
+  </div>
+  <footer class="oveja-footer">
+    <p>Las variaciones se crean como páginas. Las condiciones son una guía privada; el DM decide cuándo compartirlas.</p>
+    <div><span role="status">{{status}}</span><button class="oveja-primary" type="button" data-action="import" {{#if importDisabled}}disabled{{/if}}><i class="fa-solid fa-file-import"></i> Importar {{pending}} nota(s)</button></div>
+  </footer>
+</section>

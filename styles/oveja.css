@@ -1,0 +1,33 @@
+.escriba-oveja { --oveja-gold: #d8b56c; --oveja-muted: #c5c0b8; }
+.escriba-oveja .window-content { padding: 0; background: #20242b; color: #f3eee5; }
+.oveja-panel { display: flex; flex-direction: column; height: 100%; min-height: 0; gap: 14px; padding: 22px; }
+.oveja-heading h2 { color: #f3eee5; font-size: 27px; margin: 4px 0 8px; border: 0; }
+.oveja-heading p { margin: 0; line-height: 1.5; }
+.oveja-eyebrow { color: var(--oveja-gold); font-size: 11px; letter-spacing: 1.5px; }
+.oveja-file { display: flex; align-items: end; gap: 14px; padding: 14px; background: #2b3039; border-radius: 8px; }
+.oveja-file label { flex: 1; min-width: 0; font-size: 13px; }
+.oveja-file input { display: block; margin-top: 8px; width: 100%; color: #f3eee5; }
+.escriba-oveja button { color: #f3eee5; background: #363e49; border: 1px solid #667080; border-radius: 5px; cursor: pointer; }
+.escriba-oveja button:disabled { opacity: .5; cursor: default; }
+.escriba-oveja button:focus-visible, .escriba-oveja summary:focus-visible { outline: 2px solid var(--oveja-gold); outline-offset: 3px; }
+.oveja-review { overflow-y: auto; min-height: 80px; flex: 1; padding-right: 5px; }
+.oveja-note { border: 1px solid #4a505b; border-radius: 8px; padding: 14px; margin: 12px 0; background: #292e36; }
+.oveja-note header { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.oveja-selection { display: flex; gap: 8px; align-items: center; min-width: 0; }
+.oveja-selection strong, .oveja-muted, .oveja-text { overflow-wrap: anywhere; }
+.oveja-badge { display: inline-block; color: #ead4a7; border: 1px solid #70654f; border-radius: 12px; padding: 2px 8px; font-size: 11px; white-space: nowrap; }
+.oveja-muted, .oveja-footer p { color: var(--oveja-muted); font-size: 12px; }
+.oveja-note details { border-top: 1px solid #434b56; padding-top: 10px; margin-top: 10px; }
+.oveja-note summary { cursor: pointer; color: #f0d9ab; }
+.oveja-text { white-space: pre-wrap; line-height: 1.6; padding: 12px 0; }
+.oveja-condition { border-left: 3px solid var(--oveja-gold); padding-left: 10px; font-size: 13px; }
+.oveja-error { color: #ffd1cb; background: #4d292b; padding: 10px; border-radius: 5px; }
+.oveja-report { max-height: 140px; overflow: auto; padding: 12px; border: 1px solid #638477; border-radius: 6px; background: #263d35; }
+.oveja-report p { margin: 5px 0; }
+.oveja-existing { color: #d4c7a6; font-size: 13px; }
+.oveja-empty { padding: 35px; text-align: center; color: var(--oveja-muted); }
+.oveja-empty > i { color: var(--oveja-gold); font-size: 34px; }
+.oveja-footer { border-top: 1px solid #4a505b; padding-top: 10px; }
+.oveja-footer > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.oveja-footer .oveja-primary { background: #d8b56c; color: #23262c; font-weight: 700; padding: 8px 18px; }
+.oveja-open { flex-basis: 100%; }
