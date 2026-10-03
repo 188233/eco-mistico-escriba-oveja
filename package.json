@@ -1,7 +1,17 @@
 {
   "name": "eco-mistico-escriba-oveja",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test", "check": "node tools/check.mjs" }
+  "scripts": {
+    "test": "node --test",
+    "check": "node tools/check.mjs",
+    "test:browser": "node tools/browser-smoke.mjs",
+    "example": "node tools/build-example.mjs"
+  },
+  "devDependencies": {
+    "handlebars": "4.7.9",
+    "playwright": "1.63.0",
+    "sharp": "0.35.5"
+  }
 }

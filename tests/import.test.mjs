@@ -32,7 +32,7 @@ test("el ejemplo y los datos normalizados se pueden validar sin perder contenido
 
 test("rechaza JSON roto, versión, tamaño, ids repetidos, campos desconocidos y config inválida", () => {
   assert.throws(() => parsePackage("{"), /JSON válido/);
-  assert.throws(() => parsePackage(" ".repeat(2097153)), /2 MB/);
+  assert.throws(() => parsePackage(JSON.stringify(example) + " ".repeat(2097153)), /2 MB/);
   for (const mutate of [
     p => { p.version = 2; },
     p => { p.notas.push(structuredClone(p.notas[0])); },

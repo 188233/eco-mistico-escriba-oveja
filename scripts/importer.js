@@ -1,4 +1,6 @@
 import { MODULE_ID, makeJournalData, normalizePackage } from "./format.js";
+import { renderBookPage } from "./book-renderer.js";
+import { MediaSession, selectedImages, validateImages } from "./media.js";
 
 let importing = false;
 export function existingNote(game, pkg, note) {
@@ -8,7 +10,19 @@ export function existingNote(game, pkg, note) {
   });
 }
 
-export function reviewPackage(pkg, game) {
+export function reviewPackage(pkg, game, imagePaths) {
+  if (pkg.version === 2) return pkg.notas.map(note => ({
+    ...note, destination: `${pkg.config.carpeta} / ${note.categoria} / ${note.titulo}`,
+    duplicate: Boolean(existingNote(game, pkg, note)),
+    audience: note.paginas.some(page => page.config.visibilidad === "jugadores") ? "Incluye páginas para jugadores" : "Solo DM",
+    pageCount: note.paginas.reduce((count, page) => count + (page.tipo === "lamina" ? 2 : 1), 0),
+    book: true,
+    pages: note.paginas.map(page => ({ ...page,
+      audience: page.config.visibilidad === "jugadores" ? "Jugadores" : "Solo DM",
+      isPlate: page.tipo === "lamina",
+      html: imagePaths ? renderBookPage(page, note.config.estilo, imagePaths) : ""
+    }))
+  }));
   return pkg.notas.map(note => ({
     ...note,
     destination: `${pkg.config.carpeta} / ${note.categoria} / ${note.titulo}`,
@@ -38,9 +52,13 @@ export async function importPackage(input, selection, env = globalThis) {
   const notes = pkg.notas.filter(note => selected.has(note.id));
   if (!notes.length) throw new Error("Seleccioná al menos una nota.");
   if ([...selected].some(id => !pkg.notas.some(note => note.id === id))) throw new Error("La selección contiene una nota que no pertenece al paquete.");
-  const report = { created: [], skipped: [], errors: [] };
+  const report = { created: [], skipped: [], errors: [], uploaded: [], mediaDirectory: "" };
+  const media = new MediaSession(pkg, env);
   importing = true;
   try {
+    const pending = notes.filter(note => !existingNote(env.game, pkg, note));
+    env.onProgress?.("Validando imágenes antes de importar…");
+    await validateImages(selectedImages(pkg, pending), env.decodeImage ?? globalThis.createImageBitmap);
     let root;
     const categories = new Map();
     for (const note of notes) {
@@ -49,11 +67,13 @@ export async function importPackage(input, selection, env = globalThis) {
         continue;
       }
       try {
+        env.onProgress?.(`Importando: ${note.titulo}`);
+        const paths = await media.forNote(note);
         root ??= await ensureFolder(pkg.config.carpeta, null, env.game, env.Folder);
         if (!categories.has(note.categoria)) {
           categories.set(note.categoria, await ensureFolder(note.categoria, root.id, env.game, env.Folder));
         }
-        const data = makeJournalData(pkg, note, categories.get(note.categoria).id);
+        const data = makeJournalData(pkg, note, categories.get(note.categoria).id, paths);
         const entry = await env.JournalEntry.create(data, { renderSheet: false });
         if (!entry) throw new Error("Foundry canceló la creación del diario.");
         report.created.push({ id: entry.id, title: entry.name });
@@ -62,6 +82,10 @@ export async function importPackage(input, selection, env = globalThis) {
         break;
       }
     }
-  } finally { importing = false; }
+  } finally {
+    importing = false;
+    report.uploaded = [...media.uploaded];
+    report.mediaDirectory = media.directory;
+  }
   return report;
 }

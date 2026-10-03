@@ -1,0 +1,52 @@
+Escriba Oveja 0.2.0 — instalacion en el servidor Ubuntu
+
+Ejecutar como beta06, con acceso sudo. Requiere gh autenticado como ubuntu,
+igual que los instaladores anteriores de Eco Mistico. Cerrar la partida antes.
+El bloque valida el ZIP y su hash antes de detener el servicio, respalda la
+version instalada y actualiza solamente eco-mistico-escriba-oveja.
+
+(
+  set -e
+  cd /tmp
+  sudo -u ubuntu -H mkdir -p /home/ubuntu/escriba-oveja-update
+
+  sudo -u ubuntu -H gh release download v0.2.0 \
+    --repo 188233/eco-mistico-escriba-oveja \
+    --pattern 'install-escriba-oveja.py' \
+    --pattern 'escriba-oveja-install-manifest.json' \
+    --dir /home/ubuntu/escriba-oveja-update --clobber
+
+  sudo -u ubuntu -H test -w /home/ubuntu/foundryuserdata/Data/modules
+  sudo -u ubuntu -H python3 \
+    /home/ubuntu/escriba-oveja-update/install-escriba-oveja.py \
+    --data-dir /home/ubuntu/foundryuserdata/Data \
+    --dry-run
+
+  trap 'sudo systemctl start pm2-ubuntu.service' EXIT
+  sudo systemctl stop pm2-ubuntu.service
+
+  sudo -u ubuntu -H python3 \
+    /home/ubuntu/escriba-oveja-update/install-escriba-oveja.py \
+    --data-dir /home/ubuntu/foundryuserdata/Data \
+    --confirm-foundry-stopped
+)
+sudo systemctl is-active pm2-ubuntu.service
+
+Esperar "Instalacion terminada" y servicio "active". El trap intenta arrancar
+el servicio incluso si falla la instalacion. Un fallo no se considera resuelto
+solo porque el servicio vuelva a estar activo: revisar la salida del instalador.
+
+Recargar todos los clientes con Ctrl+F5, activar Eco Mistico — Escriba Oveja y
+comprobar version 0.2.0. Abrir Ejemplo ilustrado e importarlo como prueba:
+debe producir un diario con cuatro paginas y dos imagenes incluidas.
+
+La instalacion no importa expedientes, no cambia permisos de diarios existentes
+ni configura Midi, Core, Cuervo o Generador. La prueba real con GM y jugador
+sigue pendiente. El expediente definitivo se cargara posteriormente.
+
+Si gh requiere iniciar sesion otra vez:
+cd /tmp
+sudo -u ubuntu -H gh auth login --hostname github.com --git-protocol https --web
+
+Los respaldos quedan en Data/modules/.eco-mistico-backups/<fecha>/.
+No ejecutar una restauracion con Foundry funcionando.

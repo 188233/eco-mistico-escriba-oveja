@@ -1,37 +1,15 @@
+import { object, string, id, visibility } from "./validation.js";
+import { normalizeV2 } from "./format-v2.js";
+import { makeBookPages } from "./book-renderer.js";
+import { toHtml } from "./text.js";
+export { toHtml, escapeHtml } from "./text.js";
 export const MODULE_ID = "eco-mistico-escriba-oveja";
-export const MAX_FILE_BYTES = 2 * 1024 * 1024;
-const identifier = /^[a-z0-9][a-z0-9_-]{0,79}$/;
-
-function object(value, path, allowed) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${path}: se esperaba un objeto.`);
-  const extra = Object.keys(value).filter(key => !allowed.includes(key));
-  if (extra.length) throw new Error(`${path}: campos desconocidos: ${extra.join(", ")}.`);
-  return value;
-}
-
-function string(value, path, max = 160) {
-  if (typeof value !== "string" || !value.trim() || value.length > max) {
-    throw new Error(`${path}: debe ser texto no vacío de hasta ${max} caracteres.`);
-  }
-  return value.trim();
-}
-
-function id(value, path) {
-  if (typeof value !== "string" || !identifier.test(value)) throw new Error(`${path}: usá minúsculas, números, guiones o guiones bajos (máximo 80 caracteres).`);
-  return value;
-}
-
-function visibility(config, path, dm = false) {
-  object(config, path, ["visibilidad"]);
-  const value = config.visibilidad ?? "gm";
-  if (!["gm", "jugadores"].includes(value)) throw new Error(`${path}.visibilidad: debe ser gm o jugadores.`);
-  if (dm && value !== "gm") throw new Error(`${path}: una nota del DM y sus variaciones deben ser privadas (gm).`);
-  return { visibilidad: value };
-}
+export const MAX_FILE_BYTES = 32 * 1024 * 1024;
 
 export function normalizePackage(input) {
+  if (input?.formato === "escriba-oveja" && input.version === 2) return normalizeV2(input);
   object(input, "Paquete", ["formato", "version", "paquete", "titulo", "config", "notas"]);
-  if (input.formato !== "escriba-oveja" || input.version !== 1) throw new Error("Formato no compatible: se requiere formato escriba-oveja y version 1.");
+  if (input.formato !== "escriba-oveja" || input.version !== 1) throw new Error("Formato no compatible: se requiere formato escriba-oveja y version 1 o 2. No cargues un JSON nativo de Foundry ni una macro.");
   const config = object(input.config ?? {}, "config", ["carpeta"]);
   if (!Array.isArray(input.notas) || !input.notas.length || input.notas.length > 100) throw new Error("notas: incluí entre 1 y 100 notas.");
   const seen = new Set();
@@ -79,25 +57,21 @@ export function normalizePackage(input) {
 }
 
 export function parsePackage(text) {
-  if (typeof text !== "string" || new TextEncoder().encode(text).length > MAX_FILE_BYTES) throw new Error("El archivo supera el máximo de 2 MB.");
+  if (typeof text !== "string" || new TextEncoder().encode(text).length > MAX_FILE_BYTES) throw new Error("El archivo supera el máximo de 32 MB.");
   let input;
   try { input = JSON.parse(text.replace(/^\uFEFF/, "")); }
   catch { throw new Error("El archivo no contiene JSON válido. Revisá comillas, comas y saltos de línea."); }
+  if (input?.version === 1 && new TextEncoder().encode(text).length > 2 * 1024 * 1024) throw new Error("Los paquetes v1 admiten hasta 2 MB.");
   return normalizePackage(input);
 }
 
-// El formato v1 admite texto plano: nunca acepta HTML, macros o datos de documentos.
-export function escapeHtml(text) {
-  return String(text).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
-}
-
-export function toHtml(text) {
-  // Evita que el enriquecedor de Foundry convierta texto importado en comandos/enlaces.
-  const safe = escapeHtml(text).replace(/@/g, "@\u200b").replace(/\[\[/g, "[\u200b[");
-  return safe.split(/\r?\n\s*\r?\n/).map(part => `<p>${part.replace(/\r?\n/g, "<br>")}</p>`).join("\n");
-}
-
-export function makeJournalData(pkg, note, folder) {
+export function makeJournalData(pkg, note, folder, imagePaths = new Map()) {
+  if (pkg.version === 2) {
+    const pages = makeBookPages(note, imagePaths);
+    return { name: note.titulo, folder, pages,
+      ownership: { default: pages.some(page => page.ownership.default === 2) ? 2 : 0 },
+      flags: { [MODULE_ID]: { paquete: pkg.paquete, nota: note.id, tipo: note.tipo, categoria: note.categoria, version: 2 } } };
+  }
   const page = (title, text, audience, sort) => ({
     name: title, type: "text", sort,
     title: { show: true, level: 1 },

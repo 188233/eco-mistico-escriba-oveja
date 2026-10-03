@@ -1,5 +1,7 @@
 # Formato Escriba Oveja · versión 1
 
+Este formato sigue siendo compatible en el módulo 0.2.0. Para un único diario con varias páginas e imágenes incluidas, usá el [formato v2 de expedientes](EXPEDIENTES.md).
+
 Un archivo UTF-8 `nombre.oveja.json` contiene un paquete de hasta 100 notas y pesa como máximo 2 MB. Puede generarse junto con el contenido narrativo para que el DM solamente tenga que descargarlo e importarlo.
 
 ```json

@@ -1,14 +1,17 @@
 <section class="oveja-panel">
   <header class="oveja-heading">
-    <p class="oveja-eyebrow">ECO MÍSTICO · ESCRIBA OVEJA · 0.1</p>
+    <p class="oveja-eyebrow">ECO MÍSTICO · ESCRIBA OVEJA · 0.2</p>
     <h2>Del relato al diario</h2>
-    <p>Importá notas del DM y lore, organizadas por categoría. Revisá el contenido y quién podrá leerlo.</p>
+    <p>Notas y expedientes ilustrados en un solo archivo. Revisá el contenido y quién podrá leer cada página.</p>
   </header>
   <div class="oveja-file">
-    <label>Paquete de notas (.oveja.json, hasta 2 MB)
+    <label>Archivo .oveja.json · notas v1: 2 MB · libros v2: 32 MB
       <input type="file" accept=".json,application/json" {{#if busy}}disabled{{/if}}>
     </label>
-    <button type="button" data-action="example"><i class="fa-solid fa-download"></i> Descargar ejemplo</button>
+    <div class="oveja-examples">
+      <button type="button" data-action="bookExample"><i class="fa-solid fa-book"></i> Ejemplo ilustrado</button>
+      <button type="button" data-action="example">Ejemplo de notas</button>
+    </div>
   </div>
   {{#if error}}<p class="oveja-error" role="alert">{{error}}</p>{{/if}}
   {{#if report}}
@@ -17,12 +20,14 @@
       {{#each report.created}}<p>Creado: {{title}}</p>{{/each}}
       {{#each report.skipped}}<p>Ya existía: {{this}}</p>{{/each}}
       {{#each report.errors}}<p class="oveja-error">{{this}}</p>{{/each}}
-      {{#if report.errors.length}}<p>Los diarios creados se conservan. Podés reintentar: se omitirán los que ya existen. Pueden quedar carpetas vacías si una creación falla.</p>{{/if}}
+      {{#if report.uploaded.length}}<p>{{report.uploaded.length}} imagen(es) guardadas en {{report.mediaDirectory}}</p>{{/if}}
+      {{#if report.errors.length}}<p>Los diarios creados se conservan. Podés reintentar: se omitirán los que ya existen. Pueden quedar carpetas o imágenes sin utilizar si una creación falla.</p>{{/if}}
     </div>
   {{/if}}
   <div class="oveja-review">
     {{#if hasPackage}}
       <h3>{{title}}</h3><p class="oveja-muted">{{filename}}</p>
+      {{#if illustrated}}<p class="oveja-media-info">{{imageCount}} imagen(es) incluidas. Se guardarán al importar. Los permisos ocultan las páginas; los archivos de imagen usan el almacenamiento de Foundry y no tienen permisos propios de diario.</p>{{/if}}
       {{#each notes}}
         <article class="oveja-note">
           <header>
@@ -31,21 +36,31 @@
           </header>
           <p class="oveja-muted">{{destination}}</p>
           {{#if duplicate}}<p class="oveja-existing">Ya importada: se omite y se conserva el diario existente.</p>{{/if}}
-          <details><summary>Texto principal</summary><div class="oveja-text">{{texto}}</div></details>
+          {{#if book}}
+            <p class="oveja-muted">{{pageCount}} páginas en Foundry · estilo {{config.estilo}}</p>
+            {{#each pages}}
+              <details class="oveja-page-preview"><summary>{{titulo}} <span class="oveja-badge">{{audience}}</span></summary>
+                {{#if isPlate}}<p class="oveja-muted">Lámina original + página de transcripción editable, con el mismo permiso.</p>{{/if}}
+                <div class="oveja-preview">{{{html}}}</div>
+              </details>
+            {{/each}}
+          {{else}}
+            <details><summary>Texto principal</summary><div class="oveja-text">{{texto}}</div></details>
           {{#each variations}}
             <details><summary>{{titulo}} <span class="oveja-badge">{{audience}}</span></summary>
               <div class="oveja-text">{{texto}}</div>
               {{#if condicion}}<p class="oveja-condition"><strong>Guía para el DM:</strong> {{condicion}}</p>{{/if}}
             </details>
           {{/each}}
+          {{/if}}
         </article>
       {{/each}}
     {{else}}
-      <div class="oveja-empty"><i class="fa-solid fa-book-open"></i><h3>Una historia, varias notas</h3><p>Cargá un paquete para revisar sus diarios, categorías y variaciones antes de importarlos.</p></div>
+      <div class="oveja-empty"><i class="fa-solid fa-book-open"></i><h3>Un expediente, un archivo</h3><p>Cargá un paquete Escriba Oveja para revisar sus diarios, páginas e imágenes. También admite las notas de la versión anterior.</p><p>No hace falta crear una macro ni pegar código.</p></div>
     {{/if}}
   </div>
   <footer class="oveja-footer">
-    <p>Las variaciones se crean como páginas. Las condiciones son una guía privada; el DM decide cuándo compartirlas.</p>
-    <div><span role="status">{{status}}</span><button class="oveja-primary" type="button" data-action="import" {{#if importDisabled}}disabled{{/if}}><i class="fa-solid fa-file-import"></i> Importar {{pending}} nota(s)</button></div>
+    <p>Reimportar omite los diarios existentes. El DM decide cuándo compartir las páginas privadas.</p>
+    <div><span role="status" data-progress>{{status}}</span><button class="oveja-primary" type="button" data-action="import" {{#if importDisabled}}disabled{{/if}}><i class="fa-solid fa-file-import"></i> Importar {{pending}} diario(s)</button></div>
   </footer>
 </section>
